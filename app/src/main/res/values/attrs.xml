@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Custom theme attributes so every screen can follow the dark/light setting.
+    Values are defined in themes.xml (Theme.CWContest / Theme.CWContest.Light).
+-->
+<resources>
+    <attr name="cwBackground" format="color"/>   <!-- window background        -->
+    <attr name="cwSurface"    format="color"/>   <!-- top bar / panels         -->
+    <attr name="cwSurfaceAlt" format="color"/>   <!-- status bar / rows        -->
+    <attr name="cwText"       format="color"/>   <!-- primary text             -->
+    <attr name="cwTextDim"    format="color"/>   <!-- labels, hints            -->
+    <attr name="cwAccent"     format="color"/>   <!-- headings, callsign       -->
+    <attr name="cwAccentAlt"  format="color"/>   <!-- frequency, exchange      -->
+    <attr name="cwField"      format="color"/>   <!-- input background         -->
+    <attr name="cwButton"     format="color"/>   <!-- macro button background  -->
+    <attr name="cwWarn"       format="color"/>   <!-- dupe / out-of-band       -->
+</resources>

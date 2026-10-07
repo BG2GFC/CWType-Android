@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    N1MM-style main screen (landscape):
+      top bar : contest mode | frequency | WPM (-/slider/+) | RTS/DTR | serial | USB | menu
+      status  : last sent / CQ loop state
+      left    : callsign + received exchange + TX hint + LOG/ABORT + paddle
+      right   : F1-F12 macro grid
+      bottom  : QSO log
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="?attr/cwBackground">
+
+    <!-- ══ TOP BAR ══════════════════════════════════════════════════════════ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:background="?attr/cwSurface"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp">
+
+        <Spinner
+            android:id="@+id/spinnerContest"
+            android:layout_width="0dp"
+            android:layout_height="36dp"
+            android:layout_weight="3"/>
+
+        <TextView
+            android:id="@+id/tvFreq"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:text="14.025 MHz · 20m"
+            android:textColor="?attr/cwAccentAlt"
+            android:textSize="13sp"
+            android:gravity="center"
+            android:fontFamily="monospace"/>
+
+        <Button
+            android:id="@+id/btnWpmMinus"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:minWidth="0dp"
+            android:padding="0dp"
+            android:text="−"
+            android:textSize="16sp"/>
+
+        <SeekBar
+            android:id="@+id/seekWpm"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="4"/>
+
+        <Button
+            android:id="@+id/btnWpmPlus"
+            android:layout_width="34dp"
+            android:layout_height="34dp"
+            android:minWidth="0dp"
+            android:padding="0dp"
+            android:text="+"
+            android:textSize="16sp"/>
+
+        <TextView
+            android:id="@+id/tvWpm"
+            android:layout_width="62dp"
+            android:layout_height="wrap_content"
+            android:text="25 WPM"
+            android:textColor="?attr/cwTextDim"
+            android:textSize="11sp"
+            android:gravity="center"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"/>
+
+        <TextView
+            android:id="@+id/tvRts"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="RTS○"
+            android:textColor="?attr/cwTextDim"
+            android:textSize="11sp"
+            android:layout_marginStart="6dp"/>
+
+        <TextView
+            android:id="@+id/tvDtr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="DTR○"
+            android:textColor="?attr/cwTextDim"
+            android:textSize="11sp"
+            android:layout_marginStart="4dp"/>
+
+        <TextView
+            android:id="@+id/tvSerial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NR:001"
+            android:textColor="#FFD700"
+            android:textSize="11sp"
+            android:fontFamily="monospace"
+            android:layout_marginStart="6dp"/>
+
+        <Button
+            android:id="@+id/btnUsb"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:minWidth="0dp"
+            android:text="USB"
+            android:textSize="11sp"
+            android:layout_marginStart="6dp"/>
+
+        <Button
+            android:id="@+id/btnMenu"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:minWidth="0dp"
+            android:text="⋮"
+            android:textSize="14sp"
+            android:layout_marginStart="2dp"/>
+
+        <Button
+            android:id="@+id/btnSettings"
+            android:layout_width="wrap_content"
+            android:layout_height="32dp"
+            android:minWidth="0dp"
+            android:text="⚙"
+            android:textSize="14sp"
+            android:onClick="openSettings"
+            android:layout_marginStart="2dp"/>
+
+    </LinearLayout>
+
+    <!-- ══ STATUS BAR ═══════════════════════════════════════════════════════ -->
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="match_parent"
+        android:layout_height="22dp"
+        android:text="Ready"
+        android:textColor="?attr/cwTextDim"
+        android:textSize="11sp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:background="?attr/cwSurfaceAlt"
+        android:gravity="center_vertical"
+        android:fontFamily="monospace"
+        android:singleLine="true"/>
+
+    <!-- ══ MIDDLE ROW: input panel + macro grid ══════════════════════════════ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="2dp">
+
+        <!-- LEFT: callsign / exchange / paddle -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="2"
+            android:orientation="vertical"
+            android:background="?attr/cwSurfaceAlt"
+            android:padding="6dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="CALLSIGN"
+                android:textColor="?attr/cwTextDim"
+                android:textSize="10sp"/>
+
+            <EditText
+                android:id="@+id/etCallsign"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Callsign / Freq (MHz)"
+                android:textColor="?attr/cwText"
+                android:textColorHint="?attr/cwTextDim"
+                android:textSize="18sp"
+                android:inputType="textVisiblePassword|textCapCharacters"
+                android:imeOptions="actionNext"
+                android:singleLine="true"
+                android:background="?attr/cwField"
+                android:padding="6dp"
+                android:fontFamily="monospace"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="RCVD EXCHANGE"
+                android:textColor="?attr/cwTextDim"
+                android:textSize="10sp"
+                android:layout_marginTop="4dp"/>
+
+            <EditText
+                android:id="@+id/etExchange"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Rcvd exchange"
+                android:textColor="?attr/cwAccentAlt"
+                android:textColorHint="?attr/cwTextDim"
+                android:textSize="15sp"
+                android:inputType="textVisiblePassword|textCapCharacters"
+                android:imeOptions="actionDone"
+                android:singleLine="true"
+                android:background="?attr/cwField"
+                android:padding="6dp"
+                android:fontFamily="monospace"
+                android:layout_marginTop="2dp"/>
+
+            <!-- What the operator must send for the current contest mode -->
+            <TextView
+                android:id="@+id/tvTxHint"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TX: 599 00"
+                android:textColor="?attr/cwTextDim"
+                android:textSize="10sp"
+                android:fontFamily="monospace"
+                android:layout_marginTop="3dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="6dp">
+
+                <Button
+                    android:id="@+id/btnLog"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:minWidth="0dp"
+                    android:text="LOG QSO"
+                    android:textSize="11sp"/>
+
+                <Button
+                    android:id="@+id/btnAbort"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:minWidth="0dp"
+                    android:text="■ ABORT"
+                    android:textSize="11sp"
+                    android:layout_marginStart="4dp"/>
+
+            </LinearLayout>
+
+            <!-- Paddle: press and hold. Straight key / Iambic A / Iambic B -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="4dp">
+
+                <Button
+                    android:id="@+id/btnDot"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:minWidth="0dp"
+                    android:text="· DOT"
+                    android:textSize="12sp"/>
+
+                <Button
+                    android:id="@+id/btnDash"
+                    android:layout_width="0dp"
+                    android:layout_height="42dp"
+                    android:layout_weight="1"
+                    android:minWidth="0dp"
+                    android:text="— DASH"
+                    android:textSize="12sp"
+                    android:layout_marginStart="4dp"/>
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- RIGHT: F1-F12 macro grid (populated in code) -->
+        <GridLayout
+            android:id="@+id/macroGrid"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:columnCount="4"
+            android:rowCount="3"
+            android:background="?attr/cwSurface"
+            android:padding="2dp"
+            android:layout_marginStart="2dp"/>
+
+    </LinearLayout>
+
+    <!-- ══ LOG HEADER ════════════════════════════════════════════════════════ -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="22dp"
+        android:orientation="horizontal"
+        android:background="?attr/cwSurface"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:layout_marginTop="2dp">
+
+        <TextView android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="Time" android:textColor="?attr/cwTextDim"
+            android:textSize="10sp" android:fontFamily="monospace"
+            android:gravity="center_vertical"/>
+        <TextView android:layout_width="0dp" android:layout_weight="2"
+            android:layout_height="match_parent"
+            android:text="Callsign" android:textColor="?attr/cwTextDim"
+            android:textSize="10sp" android:fontFamily="monospace"
+            android:gravity="center_vertical"/>
+        <TextView android:layout_width="0dp" android:layout_weight="2"
+            android:layout_height="match_parent"
+            android:text="Sent" android:textColor="?attr/cwTextDim"
+            android:textSize="10sp" android:fontFamily="monospace"
+            android:gravity="center_vertical"/>
+        <TextView android:layout_width="0dp" android:layout_weight="2"
+            android:layout_height="match_parent"
+            android:text="Rcvd" android:textColor="?attr/cwTextDim"
+            android:textSize="10sp" android:fontFamily="monospace"
+            android:gravity="center_vertical"/>
+        <TextView android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="Band" android:textColor="?attr/cwTextDim"
+            android:textSize="10sp" android:fontFamily="monospace"
+            android:gravity="center_vertical"/>
+        <TextView android:layout_width="0dp" android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:text="#" android:textColor="?attr/cwTextDim"
+            android:textSize="10sp" android:fontFamily="monospace"
+            android:gravity="center_vertical"/>
+    </LinearLayout>
+
+    <!-- ══ QSO LOG LIST ══════════════════════════════════════════════════════ -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvLog"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="?attr/cwBackground"/>
+
+</LinearLayout>

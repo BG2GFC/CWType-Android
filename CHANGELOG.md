@@ -1,0 +1,49 @@
+# 更新日志
+
+本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
+
+---
+
+## [1.1.0] — 未发布
+
+### 修复（影响上机正确性）
+
+- **CW 时序错误**：元素间隔被重复计入、词距只有 4 单位（应为 7），
+  实际拍发的点划比例与词距都失真。现在由 `MorseCode.encode()` 统一生成间隔，
+  并以 PARIS 标准校验（`PARIS` + 词距 = 恰好 50 单位 = 1 词）。
+- **点划被 USB 延迟压缩**：改为绝对时间片调度，元素时长不被 USB 控制传输耗时挤短。
+- **Iambic A/B 无效**：`KeyerMode` 之前从未被引擎使用；现已实现直发 / Iambic A / Iambic B
+  拨片键控状态机（含 squeeze 交替与 B 记忆）。
+- **序号误用**：CQ WW / CQ WW VHF 也会递增并记录交换序号；现在只有 CQ WPX 使用序号。
+- **收到的交换信息被自动填成本台信息**，导致日志 `SRX` 全部记错；已取消预填并新增 `TX:` 提示。
+- **Android 10+ 导出失败**：公共 `Downloads/` 在作用域存储下不可写；改用 MediaStore
+  （API 29+ 免权限），API 26–28 保留传统路径 + 权限申请，失败回落应用私有目录。
+- **数字格式受语言环境影响**：ADIF/CSV 的频率字段改用 `Locale.US` 格式化。
+- **日志持久化未生效**：启动时现在会真正读回 ADIF 文件。
+- **宏编辑丢失**：宏现在按比赛模式持久化，长按可编辑 / 改名 / 立即发送 / 恢复默认。
+- **菜单不可达**：主题为 NoActionBar，原菜单项永远无法点击；新增右上角 `⋮` 弹出菜单。
+
+### 新增
+
+- 暗色 / 亮色主题（设置中切换，立即生效）。
+- WPM `−` / `+` 按钮与数值直接输入弹窗。
+- DOT / DASH 屏幕拨片，硬件键盘 ↑ / ↓、PageUp / PageDown 亦可当拨片。
+- 波段合法性提示（不属于当前比赛的波段显示为红色警告）。
+- 日志记录本次拍发的宏内容（ADIF `NOTES` / CSV 末列）。
+- 应用切到后台后继续拍发与 CQ 循环。
+- GitHub Actions 自动出包（`.github/workflows/android.yml`）。
+
+### 构建
+
+- 移除 `AndroidManifest.xml` 中的 `package` 属性（AGP 8 不再支持）。
+- Gradle wrapper 由 8.9 调整为 8.2，与 AGP 8.2.2 + Kotlin 1.9.22 匹配。
+- 新增 `.gitignore` / `.gitattributes` / `LICENSE`。
+- 移除重复且未被引用、逻辑与 `MainActivity` 不一致的 `MainViewModel.kt`。
+
+---
+
+## [1.0.0]
+
+- 首个版本：USB 串口（CH340 / CP210x / FTDI 等）RTS/DTR 键控、CQ WW CW /
+  CQ WW VHF / CQ WPX CW 三种比赛模式、F1–F12 宏、CQ 循环、序号管理、
+  Dupe 检查、QSO 日志与 ADIF / CSV 导出。

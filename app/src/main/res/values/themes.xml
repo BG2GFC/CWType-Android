@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- ══ Dark (default) ═════════════════════════════════════════════════ -->
+    <style name="Theme.CWContest" parent="Theme.AppCompat.NoActionBar">
+        <item name="colorPrimary">#00AAFF</item>
+        <item name="colorPrimaryDark">#005580</item>
+        <item name="colorAccent">#00FF88</item>
+
+        <item name="cwBackground">#1E1E1E</item>
+        <item name="cwSurface">#2D2D2D</item>
+        <item name="cwSurfaceAlt">#252525</item>
+        <item name="cwText">#FFFFFF</item>
+        <item name="cwTextDim">#AAAAAA</item>
+        <item name="cwAccent">#00AAFF</item>
+        <item name="cwAccentAlt">#00FF88</item>
+        <item name="cwField">#1A1A1A</item>
+        <item name="cwButton">#2A3A4A</item>
+        <item name="cwWarn">#FF4444</item>
+
+        <item name="android:windowBackground">#1E1E1E</item>
+        <item name="android:textColorPrimary">#FFFFFF</item>
+        <item name="android:textColorSecondary">#AAAAAA</item>
+        <item name="android:statusBarColor">#121212</item>
+        <item name="android:navigationBarColor">#1E1E1E</item>
+    </style>
+
+    <!-- ══ Light (Settings → Dark theme off) ══════════════════════════════ -->
+    <style name="Theme.CWContest.Light" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">#0069A8</item>
+        <item name="colorPrimaryDark">#004C7A</item>
+        <item name="colorAccent">#00874A</item>
+
+        <item name="cwBackground">#F2F3F5</item>
+        <item name="cwSurface">#E2E5E9</item>
+        <item name="cwSurfaceAlt">#EDEFF2</item>
+        <item name="cwText">#111418</item>
+        <item name="cwTextDim">#5A6470</item>
+        <item name="cwAccent">#0069A8</item>
+        <item name="cwAccentAlt">#00733F</item>
+        <item name="cwField">#FFFFFF</item>
+        <item name="cwButton">#D6DEE7</item>
+        <item name="cwWarn">#C62828</item>
+
+        <item name="android:windowBackground">#F2F3F5</item>
+        <item name="android:textColorPrimary">#111418</item>
+        <item name="android:textColorSecondary">#5A6470</item>
+        <item name="android:statusBarColor">#D8DBDF</item>
+        <item name="android:navigationBarColor">#E2E5E9</item>
+    </style>
+
+</resources>

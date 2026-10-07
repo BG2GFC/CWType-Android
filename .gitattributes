@@ -1,0 +1,19 @@
+# Keep the Gradle wrapper usable on Linux/macOS CI (bash needs LF, no BOM)
+gradlew text eol=lf
+*.sh    text eol=lf
+
+# Windows launcher
+*.bat   text eol=crlf
+
+# Binary assets must never be mangled by line-ending conversion
+*.png binary
+*.jpg binary
+*.jar binary
+*.keystore binary
+*.jks binary
+
+# Text files
+*.kt   text
+*.gradle text
+*.xml  text
+*.md   text

@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="?attr/cwBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- ── Station ──────────────────────────────────────────────────── -->
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="STATION INFO" android:textColor="?attr/cwAccent"
+            android:textSize="12sp" android:textStyle="bold"/>
+
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="My Callsign" android:textColor="?attr/cwTextDim" android:textSize="12sp"
+            android:layout_marginTop="8dp"/>
+        <EditText android:id="@+id/etMyCall"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="?attr/cwText" android:textColorHint="?attr/cwTextDim"
+            android:background="?attr/cwField" android:padding="6dp"
+            android:inputType="textCapCharacters" android:singleLine="true"/>
+
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="My Grid (4-char Maidenhead, e.g. PM01) — CQ WW VHF"
+            android:textColor="?attr/cwTextDim"
+            android:textSize="12sp" android:layout_marginTop="8dp"/>
+        <EditText android:id="@+id/etMyGrid"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="?attr/cwText" android:textColorHint="?attr/cwTextDim"
+            android:background="?attr/cwField" android:padding="6dp"
+            android:inputType="textCapCharacters" android:singleLine="true"/>
+
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="CQ Zone (e.g. 24) — CQ WW" android:textColor="?attr/cwTextDim"
+            android:textSize="12sp" android:layout_marginTop="8dp"/>
+        <EditText android:id="@+id/etMyZone"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="?attr/cwText" android:textColorHint="?attr/cwTextDim"
+            android:background="?attr/cwField" android:padding="6dp"
+            android:inputType="number" android:singleLine="true"/>
+
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Starting Serial Number — CQ WPX"
+            android:textColor="?attr/cwTextDim"
+            android:textSize="12sp" android:layout_marginTop="8dp"/>
+        <EditText android:id="@+id/etSerial"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="?attr/cwText" android:textColorHint="?attr/cwTextDim"
+            android:background="?attr/cwField" android:padding="6dp"
+            android:inputType="number" android:singleLine="true"/>
+
+        <!-- ── USB / CW ──────────────────────────────────────────────────── -->
+        <View android:layout_width="match_parent" android:layout_height="1dp"
+            android:background="?attr/cwSurface"
+            android:layout_marginTop="12dp" android:layout_marginBottom="8dp"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="USB / CW KEYING" android:textColor="?attr/cwAccent"
+            android:textSize="12sp" android:textStyle="bold"/>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="6dp">
+            <TextView android:layout_width="0dp" android:layout_weight="1"
+                android:text="Use RTS for CW" android:textColor="?attr/cwText" android:textSize="13sp"
+                android:layout_height="wrap_content"/>
+            <Switch android:id="@+id/switchRts" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="4dp">
+            <TextView android:layout_width="0dp" android:layout_weight="1"
+                android:text="Use DTR for CW" android:textColor="?attr/cwText" android:textSize="13sp"
+                android:layout_height="wrap_content"/>
+            <Switch android:id="@+id/switchDtr" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="4dp">
+            <TextView android:layout_width="0dp" android:layout_weight="1"
+                android:text="Invert Logic (key down = LOW level)" android:textColor="?attr/cwText" android:textSize="13sp"
+                android:layout_height="wrap_content"/>
+            <Switch android:id="@+id/switchInvert" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Baud Rate (RTS/DTR keying ignores this, any value works)"
+            android:textColor="?attr/cwTextDim"
+            android:textSize="12sp" android:layout_marginTop="8dp"/>
+        <Spinner android:id="@+id/spinBaud"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Keyer Mode (DOT / DASH paddle on the main screen)"
+            android:textColor="?attr/cwTextDim"
+            android:textSize="12sp" android:layout_marginTop="8dp"/>
+        <Spinner android:id="@+id/spinKeyer"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Straight = hold DOT to key. Iambic A/B = squeeze both paddles to alternate."
+            android:textColor="?attr/cwTextDim"
+            android:textSize="11sp" android:layout_marginTop="2dp"/>
+
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Tail gap after each message (dot units, 1 = one dot)"
+            android:textColor="?attr/cwTextDim"
+            android:textSize="12sp" android:layout_marginTop="8dp"/>
+        <EditText android:id="@+id/etTailGap"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="?attr/cwText" android:textColorHint="?attr/cwTextDim"
+            android:background="?attr/cwField" android:padding="6dp"
+            android:inputType="number" android:singleLine="true"/>
+
+        <!-- ── Sidetone ──────────────────────────────────────────────────── -->
+        <View android:layout_width="match_parent" android:layout_height="1dp"
+            android:background="?attr/cwSurface"
+            android:layout_marginTop="12dp" android:layout_marginBottom="8dp"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="SIDETONE" android:textColor="?attr/cwAccent"
+            android:textSize="12sp" android:textStyle="bold"/>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="6dp">
+            <TextView android:layout_width="0dp" android:layout_weight="1"
+                android:text="Enable Sidetone (headphone / speaker monitoring)"
+                android:textColor="?attr/cwText" android:textSize="13sp"
+                android:layout_height="wrap_content"/>
+            <Switch android:id="@+id/switchSidetone" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Frequency (Hz, e.g. 700)" android:textColor="?attr/cwTextDim"
+            android:textSize="12sp" android:layout_marginTop="8dp"/>
+        <EditText android:id="@+id/etSidetoneFreq"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="?attr/cwText" android:textColorHint="?attr/cwTextDim"
+            android:background="?attr/cwField" android:padding="6dp"
+            android:inputType="number" android:singleLine="true"/>
+
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Volume" android:textColor="?attr/cwTextDim"
+            android:textSize="12sp" android:layout_marginTop="8dp"/>
+        <SeekBar android:id="@+id/seekSidetoneVol"
+            android:layout_width="match_parent" android:layout_height="wrap_content"/>
+
+        <!-- ── CQ Loop ───────────────────────────────────────────────────── -->
+        <View android:layout_width="match_parent" android:layout_height="1dp"
+            android:background="?attr/cwSurface"
+            android:layout_marginTop="12dp" android:layout_marginBottom="8dp"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="CQ LOOP" android:textColor="?attr/cwAccent"
+            android:textSize="12sp" android:textStyle="bold"/>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="6dp">
+            <TextView android:layout_width="0dp" android:layout_weight="1"
+                android:text="Enable CQ Loop (press F1 to start, ABORT to stop)"
+                android:textColor="?attr/cwText" android:textSize="13sp"
+                android:layout_height="wrap_content"/>
+            <Switch android:id="@+id/switchCqLoop" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="Repeat Interval (seconds)" android:textColor="?attr/cwTextDim"
+            android:textSize="12sp" android:layout_marginTop="8dp"/>
+        <EditText android:id="@+id/etCqInterval"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:textColor="?attr/cwText" android:textColorHint="?attr/cwTextDim"
+            android:background="?attr/cwField" android:padding="6dp"
+            android:inputType="numberDecimal" android:singleLine="true"/>
+
+        <!-- ── Appearance ────────────────────────────────────────────────── -->
+        <View android:layout_width="match_parent" android:layout_height="1dp"
+            android:background="?attr/cwSurface"
+            android:layout_marginTop="12dp" android:layout_marginBottom="8dp"/>
+        <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:text="APPEARANCE" android:textColor="?attr/cwAccent"
+            android:textSize="12sp" android:textStyle="bold"/>
+
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="6dp">
+            <TextView android:layout_width="0dp" android:layout_weight="1"
+                android:text="Dark theme (off = light theme)"
+                android:textColor="?attr/cwText" android:textSize="13sp"
+                android:layout_height="wrap_content"/>
+            <Switch android:id="@+id/switchDark" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
+        </LinearLayout>
+
+        <!-- Save -->
+        <Button
+            android:id="@+id/btnSaveSettings"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:text="SAVE SETTINGS"
+            android:textSize="14sp"
+            android:layout_marginTop="20dp"/>
+
+    </LinearLayout>
+</ScrollView>

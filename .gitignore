@@ -1,0 +1,28 @@
+# Gradle / build output
+.gradle/
+build/
+app/build/
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+
+# Local machine configuration (contains the SDK path – never commit)
+local.properties
+
+# Keystores
+*.jks
+*.keystore
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Local source packages produced by tooling
+*.zip
+
+# Nested local clone of this same repository (contains its own .git)
+CWType-Android/

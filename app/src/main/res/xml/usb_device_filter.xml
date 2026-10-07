@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    USB device filter – common CW interface chips.
+    The app will receive USB_DEVICE_ATTACHED for these VID/PIDs.
+    usb-serial-for-android will handle the actual driver selection.
+-->
+<resources>
+    <!-- CH340 / CH341 -->
+    <usb-device vendor-id="0x1A86" product-id="0x7523"/>
+    <usb-device vendor-id="0x1A86" product-id="0x5523"/>
+
+    <!-- CP210x (Silicon Labs) -->
+    <usb-device vendor-id="0x10C4" product-id="0xEA60"/>
+    <usb-device vendor-id="0x10C4" product-id="0xEA70"/>
+
+    <!-- FTDI FT232 / FT231X -->
+    <usb-device vendor-id="0x0403" product-id="0x6001"/>
+    <usb-device vendor-id="0x0403" product-id="0x6010"/>
+    <usb-device vendor-id="0x0403" product-id="0x6011"/>
+    <usb-device vendor-id="0x0403" product-id="0x6014"/>
+    <usb-device vendor-id="0x0403" product-id="0x6015"/>
+
+    <!-- Prolific PL2303 -->
+    <usb-device vendor-id="0x067B" product-id="0x2303"/>
+
+    <!-- STM32 CDC -->
+    <usb-device vendor-id="0x0483" product-id="0x5740"/>
+</resources>

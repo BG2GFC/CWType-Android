@@ -1,0 +1,104 @@
+name: Android CI
+
+# Builds the APK on every push / pull request and, for version tags,
+# publishes the APKs on the GitHub Releases page.
+#
+# Getting an installable APK without a local Android SDK:
+#   1. push this repository to GitHub
+#   2. open the "Actions" tab -> "Android CI" -> newest run
+#   3. download the artifact "cwcontest-debug-apk" (app-debug.apk)
+#   4. copy the APK to the phone and install it (allow "install unknown apps")
+
+on:
+  push:
+    branches: [ main, master, 'codex/**' ]
+    tags: [ 'v*' ]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build APK
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle (with dependency cache)
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+
+      - name: Unit tests
+        run: ./gradlew --no-daemon test
+
+      - name: Build debug APK
+        run: ./gradlew --no-daemon assembleDebug
+
+      - name: Build release APK (unsigned)
+        run: ./gradlew --no-daemon assembleRelease
+        continue-on-error: true
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: cwcontest-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Upload release APK (unsigned)
+        uses: actions/upload-artifact@v4
+        with:
+          name: cwcontest-release-unsigned-apk
+          path: app/build/outputs/apk/release/*.apk
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload unit test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-report
+          path: app/build/reports/tests/**
+          if-no-files-found: ignore
+          retention-days: 14
+
+  release:
+    name: Publish APK to Releases
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download built APKs
+        uses: actions/download-artifact@v4
+        with:
+          path: apk
+
+      - name: Show artifacts
+        run: find apk -name '*.apk' -print
+
+      - name: Create / update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: apk/**/*.apk
+          generate_release_notes: true
+          body: |
+            CW Contest for Android — 业余无线电 CW 拍发线（N1MM 风格）
+
+            安装：把 `app-debug.apk` 传到手机，允许"安装未知应用"后安装。
+            `app-release-unsigned.apk` 需要用你自己的签名密钥（apksigner / Android Studio）签名后才能安装。

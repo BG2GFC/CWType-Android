@@ -8,14 +8,16 @@
 ## 目录
 1. [功能特性](#功能特性)
 2. [硬件接线](#硬件接线)
-3. [编译安装](#编译安装)
-4. [首次配置](#首次配置)
-5. [主界面说明](#主界面说明)
-6. [宏变量参考](#宏变量参考)
-7. [比赛模式说明](#比赛模式说明)
-8. [ADIF / CSV 导出](#adif--csv-导出)
-9. [项目结构](#项目结构)
-10. [常见问题](#常见问题)
+3. [获取 APK](#获取-apk)
+4. [编译安装](#编译安装)
+5. [首次配置](#首次配置)
+6. [主界面说明](#主界面说明)
+7. [宏变量参考](#宏变量参考)
+8. [比赛模式说明](#比赛模式说明)
+9. [ADIF / CSV 导出](#adif--csv-导出)
+10. [项目结构](#项目结构)
+11. [常见问题](#常见问题)
+12. [更新日志](#更新日志)
 
 ---
 
@@ -75,6 +77,52 @@
 
 ---
 
+## 获取 APK
+
+有两条路，任选其一。
+
+### 方案 A：用 GitHub Actions 自动出包（推荐，不需要本地 Android 环境）
+
+仓库已包含 `.github/workflows/android.yml`。把它推到 GitHub 后：
+
+1. 打开仓库 → **Actions** → **Android CI** → 最新一次运行；
+2. 页面底部 **Artifacts** 下载 `cwcontest-debug-apk`；
+3. 解压得到 `app-debug.apk`，传到手机、允许"安装未知应用"后安装。
+
+打 tag 时会自动在 **Releases** 里发布 APK：
+
+```bash
+git tag v1.1.0 && git push origin v1.1.0
+```
+
+CI 会跑单元测试并产出两种包：
+
+| 产物 | 说明 |
+|------|------|
+| `app-debug.apk` | 已用 debug 密钥签名，可直接安装（包名带 `.debug` 后缀）|
+| `app-release-unsigned.apk` | 体积更小（R8 混淆），需自行签名后才能安装 |
+
+自签名 release 包：
+
+```bash
+keytool -genkeypair -v -keystore cwcontest.jks -keyalg RSA -keysize 2048 \
+        -validity 10000 -alias cwcontest
+$ANDROID_HOME/build-tools/34.0.0/zipalign -v 4 app-release-unsigned.apk app-release.apk
+$ANDROID_HOME/build-tools/34.0.0/apksigner sign --ks cwcontest.jks app-release.apk
+```
+
+### 方案 B：本地构建
+
+需要 Android Studio（含 SDK 34）或命令行 JDK 17 + Android SDK 34。
+
+```bash
+./gradlew assembleDebug          # 产物: app/build/outputs/apk/debug/app-debug.apk
+./gradlew installDebug           # 直接装到已连接手机
+./gradlew test                   # 单元测试
+```
+
+---
+
 ## 编译安装
 
 ### 环境要求
@@ -92,9 +140,8 @@
 ### 步骤
 
 ```bash
-# 1. 克隆 / 解压项目
-unzip CWContest.zip -d CWContest
-cd CWContest
+# 1. 克隆项目
+git clone <你的仓库地址> && cd CWType-Andriod
 
 # 2. 用 Android Studio 打开，或命令行构建
 ./gradlew assembleDebug
@@ -104,7 +151,8 @@ cd CWContest
 ```
 
 > **注意**：`settings.gradle` 中已包含 JitPack 仓库，用于下载
-> `usb-serial-for-android` 库，首次构建需要网络连接。
+> `usb-serial-for-android` 库，**首次构建必须联网**（下载 AGP、Kotlin、
+> AndroidX 与 Gradle 发行版，约数百 MB，之后走本地缓存）。
 
 ### 依赖说明
 
@@ -275,6 +323,11 @@ app/src/main/res/
 
 app/src/test/java/com/cwcontest/
 └── CWContestTest.kt    — JUnit 单元测试（MorseCode / Macro / Contest / Band）
+
+.github/workflows/
+└── android.yml         — CI：跑单测 + 出 debug / release APK + tag 时发布 Release
+
+根目录：LICENSE（MIT）/ CHANGELOG.md / .gitignore / .gitattributes
 ```
 
 ---
@@ -306,6 +359,16 @@ A: 主题是 NoActionBar（N1MM 风格全屏布局），所有菜单项都在右
 A: 宏按比赛模式分别保存在 SharedPreferences 中，切换比赛会切换宏组（这是特性）。
 若要恢复某一组的默认值，用 ⋮ 菜单 → Restore/Reset Macros。
 
+**Q: 构建时报 `Could not resolve com.github.mik3y:usb-serial-for-android:3.4.6`？**  
+A: 该库通过 JitPack 分发，首次拉取需要网络且可能较慢（JitPack 是构建一次后缓存）。
+重试一次通常即可；若仍失败，可把 `app/build.gradle` 中的版本换成 `3.6.0`
+（该版本的 `setParameters(baudRate, dataBits, stopBits, parity)` 签名与本工程一致），
+或把库源码以 `include ':usb-serial-for-android'` 的方式放进工程本地编译。
+
+**Q: 手机上装不上 APK？**  
+A: `app-debug.apk` 用 debug 密钥签名，可直接安装（首次需允许"安装未知应用"）；
+`app-release-unsigned.apk` 是**未签名**包，必须先用自己的密钥签名再安装。
+
 **Q: 如何支持更多 USB 芯片？**  
 A: 在 `usb_device_filter.xml` 中添加对应 VID/PID，`usb-serial-for-android`
 已内置大量驱动，一般无需修改 Kotlin 代码。
@@ -318,6 +381,10 @@ A: 在 CQ WW VHF 模式下，呼号框为空时直接输入频率（如 `144.100
 
 ## 许可证
 
-MIT License — 自由使用、修改和分发，请保留原始版权声明。
+MIT License — 自由使用、修改和分发，请保留原始版权声明，全文见 [LICENSE](LICENSE)。
+
+## 更新日志
+
+各版本变更见 [CHANGELOG.md](CHANGELOG.md)。
 
 73 de BG2GFC / CWType Project
