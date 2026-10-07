@@ -1,8 +1,11 @@
 # CW Contest — Android CW Keying App
 
-业余无线电 CW 拍发线安卓应用，专为 CQ WW CW / CQ WW VHF / CQ WPX CW 设计，
+业余无线电 CW 拍发线安卓应用
+专为 CQ WW CW / CQ WW VHF / CQ WPX CW 设计
+支持老电台的转接，需搭配配套转接板
 界面逻辑贴近 N1MM Logger。
 
+——Create by codex（DeepSeek）
 ---
 
 ## 目录
