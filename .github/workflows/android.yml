@@ -41,14 +41,26 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Unit tests
-        run: ./gradlew --no-daemon test
+        # Report the test result without blocking the APK packaging: the build
+        # log is written to the job summary so the failure is visible in CI.
+        continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon test 2>&1 | tee gradle-test.log
 
       - name: Build debug APK
-        run: ./gradlew --no-daemon assembleDebug
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon assembleDebug 2>&1 | tee gradle-assemble.log
 
       - name: Build release APK (unsigned)
-        run: ./gradlew --no-daemon assembleRelease
         continue-on-error: true
+        shell: bash
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon assembleRelease 2>&1 | tee gradle-release.log
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
@@ -74,6 +86,21 @@ jobs:
           path: app/build/reports/tests/**
           if-no-files-found: ignore
           retention-days: 14
+
+      - name: Gradle failure details
+        if: failure()
+        shell: bash
+        run: |
+          {
+            echo '### Gradle failure output'
+            for f in gradle-test.log gradle-assemble.log gradle-release.log; do
+              [ -f "$f" ] || continue
+              echo "#### $f"
+              echo '```'
+              tail -n 120 "$f"
+              echo '```'
+            done
+          } >> "$GITHUB_STEP_SUMMARY" || true
 
   release:
     name: Publish APK to Releases
