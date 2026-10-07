@@ -3,23 +3,23 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item android:id="@+id/action_export_adif"
-        android:title="Export ADIF"
+        android:title="导出 ADIF"
         app:showAsAction="never"/>
 
     <item android:id="@+id/action_export_csv"
-        android:title="Export CSV"
+        android:title="导出 CSV"
         app:showAsAction="never"/>
 
     <item android:id="@+id/action_clear_log"
-        android:title="Clear Log"
+        android:title="清空日志"
         app:showAsAction="never"/>
 
     <item android:id="@+id/action_reset_macros"
-        android:title="Reset Macros (this contest)"
+        android:title="恢复默认宏（当前比赛）"
         app:showAsAction="never"/>
 
     <item android:id="@+id/action_settings"
-        android:title="Settings"
+        android:title="设置"
         android:icon="@android:drawable/ic_menu_preferences"
         app:showAsAction="ifRoom"/>
 

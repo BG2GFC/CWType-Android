@@ -222,6 +222,7 @@ class ContestManagerTest {
         assertTrue(mgr.usesSerial(ContestMode.CQ_WPX_CW))
         assertFalse(mgr.usesSerial(ContestMode.CQ_WW_CW))
         assertFalse(mgr.usesSerial(ContestMode.CQ_WW_VHF))
+        assertFalse(mgr.usesSerial(ContestMode.SATELLITE))
     }
 
     @Test
@@ -301,6 +302,38 @@ class ContestManagerTest {
         val exMacro = macros.first { it.functionKey == 2 }
         assertTrue(exMacro.template.contains("{SERIAL}"))
     }
+
+    @Test
+    fun `satellite TU macro is 5NN TU`() {
+        val macros = mgr.defaultMacros(ContestMode.SATELLITE)
+        assertEquals("5NN TU", macros.first { it.functionKey == 3 }.template)
+    }
+
+    @Test
+    fun `satellite TU+CQ macro is 5NN TU with both callsigns`() {
+        val macros = mgr.defaultMacros(ContestMode.SATELLITE)
+        val tuCq = macros.first { it.functionKey == 12 }.template
+        assertEquals("5NN TU {MYCALL} {MYCALL} K", tuCq)
+    }
+
+    @Test
+    fun `satellite CQ macros omit DE`() {
+        val macros = mgr.defaultMacros(ContestMode.SATELLITE)
+        assertEquals(
+            "CQ CQ {MYCALL} {MYCALL} K",
+            macros.first { it.functionKey == 1 }.template
+        )
+        assertEquals(
+            "CQ {MYCALL} K",
+            macros.first { it.functionKey == 8 }.template
+        )
+        assertTrue(macros.none { it.template.contains("DE {MYCALL}") })
+    }
+
+    @Test
+    fun `satellite sent exchange is the 5NN report`() {
+        assertEquals("5NN", mgr.buildSentExchange(ContestMode.SATELLITE))
+    }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
@@ -336,5 +369,18 @@ class BandTest {
         val bands = Band.forContest(ContestMode.CQ_WW_VHF)
         assertEquals(2, bands.size)
         assertTrue(bands.containsAll(listOf(Band.BAND_6, Band.BAND_2)))
+    }
+
+    @Test
+    fun `satellite bands include 2m 70cm and 10m`() {
+        val bands = Band.forContest(ContestMode.SATELLITE)
+        assertTrue(bands.containsAll(listOf(Band.BAND_2, Band.BAND_70, Band.BAND_10)))
+        // 2m is the default band when the satellite mode is picked
+        assertEquals(Band.BAND_2, bands.last())
+    }
+
+    @Test
+    fun `fromFreq returns 70cm for 435 000`() {
+        assertEquals(Band.BAND_70, Band.fromFreq(435.000))
     }
 }

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-    N1MM-style main screen (landscape):
-      top bar : contest mode | frequency | WPM (-/slider/+) | RTS/DTR | serial | USB | menu
+    N1MM-style main screen (portrait):
+      top bar : row 1 – contest mode | frequency | WPM (-/slider/+)
+                row 2 – RTS/DTR | serial | USB | menu | settings
       status  : last sent / CQ loop state
       left    : callsign + received exchange + TX hint + LOG/ABORT + paddle
       right   : F1-F12 macro grid
@@ -14,15 +15,24 @@
     android:orientation="vertical"
     android:background="?attr/cwBackground">
 
-    <!-- ══ TOP BAR ══════════════════════════════════════════════════════════ -->
+    <!-- ══ TOP BAR ══════════════════════════════════════════════════════════
+         Portrait: two rows. In one row the fixed-width items (WPM −/+, the
+         WPM label, RTS/DTR/NR, USB/⋮/⚙) already fill a phone's width, which
+         would squeeze the contest spinner and the WPM slider down to ~0dp. -->
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
         android:background="?attr/cwSurface"
         android:paddingStart="4dp"
         android:paddingEnd="4dp">
+
+        <!-- ── row 1: contest mode · frequency · WPM ─────────────────────── -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
         <Spinner
             android:id="@+id/spinnerContest"
@@ -54,7 +64,7 @@
             android:id="@+id/seekWpm"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="4"/>
+            android:layout_weight="3"/>
 
         <Button
             android:id="@+id/btnWpmPlus"
@@ -75,6 +85,16 @@
             android:gravity="center"
             android:paddingTop="4dp"
             android:paddingBottom="4dp"/>
+
+        </LinearLayout>
+
+        <!-- ── row 2: keying lines · serial · USB · menu · settings ──────── -->
+        <LinearLayout
+            android:id="@+id/rowTopKeys"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
         <TextView
             android:id="@+id/tvRts"
@@ -104,6 +124,11 @@
             android:fontFamily="monospace"
             android:layout_marginStart="6dp"/>
 
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1"/>
+
         <Button
             android:id="@+id/btnUsb"
             android:layout_width="wrap_content"
@@ -132,6 +157,8 @@
             android:onClick="openSettings"
             android:layout_marginStart="2dp"/>
 
+        </LinearLayout>
+
     </LinearLayout>
 
     <!-- ══ STATUS BAR ═══════════════════════════════════════════════════════ -->
@@ -149,18 +176,20 @@
         android:fontFamily="monospace"
         android:singleLine="true"/>
 
-    <!-- ══ MIDDLE ROW: input panel + macro grid ══════════════════════════════ -->
+    <!-- ══ MIDDLE: input panel, then the macro grid underneath ═══════════════
+         Portrait: both blocks span the full width instead of sharing one row,
+         so the callsign / exchange fields and the F1-F12 buttons all get the
+         whole screen width. -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_marginTop="2dp">
 
         <!-- LEFT: callsign / exchange / paddle -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="2"
             android:orientation="vertical"
             android:background="?attr/cwSurfaceAlt"
             android:padding="6dp">
@@ -283,14 +312,13 @@
         <!-- RIGHT: F1-F12 macro grid (populated in code) -->
         <GridLayout
             android:id="@+id/macroGrid"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
             android:columnCount="4"
             android:rowCount="3"
             android:background="?attr/cwSurface"
             android:padding="2dp"
-            android:layout_marginStart="2dp"/>
+            android:layout_marginTop="2dp"/>
 
     </LinearLayout>
 

@@ -111,6 +111,7 @@ class LogManager(private val context: Context) {
         Band.BAND_10  -> "10M"
         Band.BAND_6   -> "6M"
         Band.BAND_2   -> "2M"
+        Band.BAND_70  -> "70CM"
     }
 
     private fun bandFromAdif(value: String): Band? = when (value.uppercase()) {
@@ -122,6 +123,7 @@ class LogManager(private val context: Context) {
         "10M"  -> Band.BAND_10
         "6M"   -> Band.BAND_6
         "2M"   -> Band.BAND_2
+        "70CM" -> Band.BAND_70
         else   -> null
     }
 

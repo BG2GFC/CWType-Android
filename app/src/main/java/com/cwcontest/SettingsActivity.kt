@@ -34,7 +34,7 @@ class SettingsActivity : AppCompatActivity() {
                        else R.style.Theme_CWContest_Light
         setTheme(appliedTheme)
         setContentView(R.layout.activity_settings)
-        supportActionBar?.apply { setDisplayHomeAsUpEnabled(true); title = "Settings" }
+        supportActionBar?.apply { setDisplayHomeAsUpEnabled(true); title = "设置" }
 
         settingsMgr = SettingsManager(this)
         settings    = current
@@ -113,7 +113,7 @@ class SettingsActivity : AppCompatActivity() {
             tailGapUnits     = (etTailGap.text.toString().toIntOrNull() ?: 1).coerceIn(0, 10)
         )
         settingsMgr.save(updated)
-        Toast.makeText(this, "Settings saved", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "设置已保存", Toast.LENGTH_SHORT).show()
     }
 
     override fun onSupportNavigateUp(): Boolean { finish(); return true }

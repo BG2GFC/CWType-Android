@@ -71,6 +71,17 @@ class MainActivity : AppCompatActivity() {
     private lateinit var macroGrid:      GridLayout
     private lateinit var rvLog:          RecyclerView
 
+    // ── Rows that step aside while the soft keyboard is on screen ─────────────
+    private lateinit var rootLayout:      View
+    private lateinit var tvExchangeLabel: TextView
+    private lateinit var rowPaddle:       View
+    private lateinit var rowLogHeader:    View
+    private var rowTopKeys: View?         = null
+
+    /** True while the on-screen keyboard is up – see [setupImeAwareLayout]. */
+    private var typingMode = false
+    private var fullRootHeightPx = 0
+
     // ── CQ loop ───────────────────────────────────────────────────────────────
     private val cqHandler = Handler(Looper.getMainLooper())
     private var cqLooping = false
@@ -95,6 +106,7 @@ class MainActivity : AppCompatActivity() {
 
         initManagers()
         bindViews()
+        setupImeAwareLayout()
         setupContestSpinner()
         setupWpmControls()
         setupCallsignInput()
@@ -104,6 +116,7 @@ class MainActivity : AppCompatActivity() {
         setupPaddles()
 
         cwEngine.start()
+        applyModeVisibility()
         updateTxHint()
         updateSerial()
     }
@@ -128,6 +141,7 @@ class MainActivity : AppCompatActivity() {
             spinnerContest.setSelection(ContestMode.values().indexOf(settings.contestMode))
             setupMacroGrid()
         }
+        applyModeVisibility()
         syncBandToMode()
         updateTxHint()
         updateSerial()
@@ -195,6 +209,14 @@ class MainActivity : AppCompatActivity() {
         btnDash        = findViewById(R.id.btnDash)
         macroGrid      = findViewById(R.id.macroGrid)
         rvLog          = findViewById(R.id.rvLog)
+
+        rootLayout      = findViewById(R.id.rootLayout)
+        tvExchangeLabel = findViewById(R.id.tvExchangeLabel)
+        rowPaddle       = findViewById(R.id.rowPaddle)
+        rowLogHeader    = findViewById(R.id.rowLogHeader)
+        // Only the portrait layout splits the top bar in two rows; the
+        // landscape one keeps everything in a single row.
+        rowTopKeys      = findViewById(R.id.rowTopKeys)
     }
 
     // ── Contest mode ──────────────────────────────────────────────────────────
@@ -216,6 +238,7 @@ class MainActivity : AppCompatActivity() {
                 contestMgr.applySettings(settings)
                 stopCqLoop()
                 setupMacroGrid()
+                applyModeVisibility()
                 syncBandToMode()
                 updateTxHint()
                 updateSerial()
@@ -231,12 +254,69 @@ class MainActivity : AppCompatActivity() {
             updateFreqDisplay()
             return
         }
-        // 20m for the HF contests, 2m for the VHF contest
+        // 20m for the HF contests, and the last (lowest) band of the mode's
+        // own set otherwise – 2m for CQ WW VHF and for satellites.
         val fallback = if (allowed.contains(Band.BAND_20)) Band.BAND_20 else allowed.last()
         currentBand    = fallback
         currentFreqMhz = fallback.freqStart + (if (fallback == Band.BAND_2) 0.1 else 0.025)
         updateFreqDisplay()
     }
+
+    // ── Mode-dependent widgets ────────────────────────────────────────────────
+
+    /**
+     * Satellite QSOs are just a signal report between the two stations: there is
+     * no serial number to track and nothing to type into the exchange box, so
+     * both are hidden while that mode is selected.
+     */
+    private fun applyModeVisibility() {
+        val satellite = settings.contestMode == ContestMode.SATELLITE
+
+        tvSerial.visibility         = if (satellite) View.GONE else View.VISIBLE
+        tvExchangeLabel.visibility  = if (satellite) View.GONE else View.VISIBLE
+        etExchange.visibility       = if (satellite) View.GONE else View.VISIBLE
+
+        // With the exchange box gone the callsign field is the last input, so
+        // its IME action logs the QSO instead of jumping to a hidden field.
+        etCallsign.imeOptions = if (satellite) EditorInfo.IME_ACTION_DONE
+                                else EditorInfo.IME_ACTION_NEXT
+        if (satellite && etExchange.hasFocus()) etCallsign.requestFocus()
+    }
+
+    // ── Soft keyboard (IME) handling ──────────────────────────────────────────
+
+    /**
+     * The screen is locked to portrait and the window uses `adjustResize`, so
+     * the on-screen keyboard shrinks the layout. Once it is up there is not
+     * enough room for everything, and the F1–F12 macro buttons – being the
+     * lowest block – used to be pushed off screen and disappear.
+     *
+     * While the keyboard is visible the optional rows (paddle, TX hint, QSO
+     * list, the second top-bar row) step aside so the callsign / exchange boxes
+     * and the whole macro grid stay on screen. They come back as soon as the
+     * keyboard is dismissed.
+     */
+    private fun setupImeAwareLayout() {
+        rootLayout.viewTreeObserver.addOnGlobalLayoutListener {
+            val height = rootLayout.height
+            if (height <= 0) return@addOnGlobalLayoutListener
+            if (height > fullRootHeightPx) fullRootHeightPx = height
+            val keyboardUp = height < fullRootHeightPx - dp(110)
+            if (keyboardUp != typingMode) applyTypingMode(keyboardUp)
+        }
+    }
+
+    private fun applyTypingMode(typing: Boolean) {
+        typingMode = typing
+        val vis = if (typing) View.GONE else View.VISIBLE
+        rowTopKeys?.visibility  = vis
+        tvTxHint.visibility     = vis
+        rowPaddle.visibility    = vis
+        rowLogHeader.visibility = vis
+        rvLog.visibility        = vis
+    }
+
+    private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
     // ── WPM ───────────────────────────────────────────────────────────────────
 
@@ -281,12 +361,12 @@ class MainActivity : AppCompatActivity() {
             setSelectAllOnFocus(true)
         }
         AlertDialog.Builder(this)
-            .setTitle("CW Speed (5–60 WPM)")
+            .setTitle("CW 速度 (5–60 WPM)")
             .setView(input)
-            .setPositiveButton("OK") { _, _ ->
+            .setPositiveButton("确定") { _, _ ->
                 input.text.toString().toIntOrNull()?.let { applyWpm(it, true) }
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("取消", null)
             .show()
     }
 
@@ -306,7 +386,7 @@ class MainActivity : AppCompatActivity() {
             value >= 1.8     -> value              // 14 → 14 MHz
             else             -> return null
         }
-        return mhz.takeIf { it in 1.8..148.0 }
+        return mhz.takeIf { it in 1.8..450.0 }      // 160 m … 70 cm
     }
 
     private fun setupCallsignInput() {
@@ -329,7 +409,7 @@ class MainActivity : AppCompatActivity() {
                 val call = text.trim().uppercase()
                 val dupe = logMgr.isDupe(call, currentBand, settings.contestMode)
                 etCallsign.setTextColor(color(if (dupe) R.attr.cwWarn else R.attr.cwText))
-                if (dupe) updateStatus("DUPE: $call already worked on ${currentBand.displayName}")
+                if (dupe) updateStatus("重复: $call 已在 ${currentBand.displayName} 通联过")
             }
         })
 
@@ -344,7 +424,9 @@ class MainActivity : AppCompatActivity() {
                 }
                 actionId == EditorInfo.IME_ACTION_NEXT ||
                 actionId == EditorInfo.IME_ACTION_DONE -> {
-                    etExchange.requestFocus()
+                    // Satellite mode hides the exchange box – log straight away.
+                    if (etExchange.visibility == View.VISIBLE) etExchange.requestFocus()
+                    else logQso()
                     true
                 }
                 else -> false
@@ -368,7 +450,9 @@ class MainActivity : AppCompatActivity() {
     private fun updateFreqDisplay() {
         val bandOk = Band.forContest(settings.contestMode).contains(currentBand)
         val label  = if (bandOk) currentBand.displayName else "${currentBand.displayName}!"
-        tvFreq.text = String.format(Locale.US, "%.3f MHz · %s", currentFreqMhz, label)
+        // Only the band is shown; the exact frequency stays internal (it still
+        // goes into the QSO log and the {FREQ} macro variable).
+        tvFreq.text = label
         tvFreq.setTextColor(color(if (bandOk) R.attr.cwAccentAlt else R.attr.cwWarn))
     }
 
@@ -376,12 +460,12 @@ class MainActivity : AppCompatActivity() {
     private fun updateTxHint() {
         val exch = contestMgr.buildSentExchange(serial = contestMgr.peekNextSerial())
         val warn = when {
-            settings.myCallsign.isBlank() -> "  ⚠ set callsign"
+            settings.myCallsign.isBlank() -> "  ⚠ 请设置呼号"
             settings.contestMode == ContestMode.CQ_WW_VHF && settings.myGrid.isBlank() ->
-                "  ⚠ set grid"
+                "  ⚠ 请设置网格"
             else -> ""
         }
-        tvTxHint.text = "TX: $exch$warn"
+        tvTxHint.text = "发: $exch$warn"
     }
 
     // ── Macro grid F1–F12 ─────────────────────────────────────────────────────
@@ -392,27 +476,32 @@ class MainActivity : AppCompatActivity() {
             contestMgr.defaultMacros(settings.contestMode)
         )
         macroGrid.removeAllViews()
-        macroGrid.columnCount = 4
-        macroGrid.rowCount    = 3
+        val cols = resources.getInteger(R.integer.macro_columns)
+        macroGrid.columnCount = cols
+        macroGrid.rowCount    = (macros.size + cols - 1) / cols
 
         macros.forEach { macro ->
             val btn = Button(this).apply {
                 text     = "F${macro.functionKey}  ${macro.label}"
                 textSize = 9f
+                // Button's default 48dp min height would make the 3-row grid
+                // taller than the space the portrait screen can spare.
+                minHeight = 0
+                minWidth  = 0
                 setPadding(2, 2, 2, 2)
                 setBackgroundColor(color(R.attr.cwButton))
                 setTextColor(color(R.attr.cwText))
                 setOnClickListener   { sendMacro(macro) }
                 setOnLongClickListener { showMacroMenu(macro); true }
             }
-            val col = (macro.functionKey - 1) % 4
-            val row = (macro.functionKey - 1) / 4
+            val col = (macro.functionKey - 1) % cols
+            val row = (macro.functionKey - 1) / cols
             val lp  = GridLayout.LayoutParams(
                 GridLayout.spec(row, GridLayout.FILL, 1f),
                 GridLayout.spec(col, GridLayout.FILL, 1f)
             ).apply {
                 width  = 0
-                height = GridLayout.LayoutParams.WRAP_CONTENT
+                height = dp(40)
                 setMargins(2, 2, 2, 2)
             }
             macroGrid.addView(btn, lp)
@@ -422,7 +511,7 @@ class MainActivity : AppCompatActivity() {
     private fun showMacroMenu(macro: Macro) {
         AlertDialog.Builder(this)
             .setTitle("F${macro.functionKey} · ${macro.label}")
-            .setItems(arrayOf("Edit template", "Rename button", "Send now", "Restore all defaults")) { _, which ->
+            .setItems(arrayOf("编辑模板", "重命名按钮", "立即发送", "恢复全部默认")) { _, which ->
                 when (which) {
                     0 -> editMacro(macro)
                     1 -> renameMacro(macro)
@@ -430,7 +519,7 @@ class MainActivity : AppCompatActivity() {
                     3 -> {
                         settingsMgr.resetMacros(settings.contestMode)
                         setupMacroGrid()
-                        toast("Macros restored to defaults")
+                        toast("宏已恢复默认")
                     }
                 }
             }
@@ -446,13 +535,13 @@ class MainActivity : AppCompatActivity() {
             setPadding(12, 12, 12, 12)
         }
         AlertDialog.Builder(this)
-            .setTitle("Edit F${macro.functionKey} template")
-            .setMessage("Variables: {MYCALL} {CALL} {RST} {SERIAL} {NR} {ZONE} {GRID} {THEIRGRID} {BAND} {FREQ}")
+            .setTitle("编辑 F${macro.functionKey} 模板")
+            .setMessage("可用变量: {MYCALL} {CALL} {RST} {SERIAL} {NR} {ZONE} {GRID} {THEIRGRID} {BAND} {FREQ}")
             .setView(et)
-            .setPositiveButton("Save") { _, _ ->
+            .setPositiveButton("保存") { _, _ ->
                 saveMacro(macro.copy(template = et.text.toString().trim()))
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("取消", null)
             .show()
     }
 
@@ -462,12 +551,12 @@ class MainActivity : AppCompatActivity() {
             inputType = InputType.TYPE_CLASS_TEXT
         }
         AlertDialog.Builder(this)
-            .setTitle("Rename F${macro.functionKey}")
+            .setTitle("重命名 F${macro.functionKey}")
             .setView(et)
-            .setPositiveButton("Save") { _, _ ->
+            .setPositiveButton("保存") { _, _ ->
                 saveMacro(macro.copy(label = et.text.toString().trim().take(10)))
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton("取消", null)
             .show()
     }
 
@@ -529,17 +618,17 @@ class MainActivity : AppCompatActivity() {
     private fun showUsbDialog() {
         val devices = usbMgr.listDevices()
         if (devices.isEmpty()) {
-            toast("No USB serial device found.\nConnect a CH340 / CP210x / FTDI interface.")
+            toast("未找到 USB 串口设备。\n请接入 CH340 / CP210x / FTDI 转接板。")
             return
         }
         AlertDialog.Builder(this)
-            .setTitle("Select USB CW interface")
+            .setTitle("选择 USB CW 接口")
             .setItems(devices.map { it.displayName }.toTypedArray()) { _, idx ->
                 usbMgr.requestPermissionAndOpen(
                     devices[idx], settings.baudRate, idleLevel = settings.invertLogic
                 )
             }
-            .setNegativeButton("Disconnect") { _, _ -> usbMgr.closePort() }
+            .setNegativeButton("断开连接") { _, _ -> usbMgr.closePort() }
             .show()
     }
 
@@ -572,7 +661,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun startCqLoop(macro: Macro) {
         cqLooping = true
-        updateStatus("CQ LOOP ACTIVE – F1 repeating")
+        updateStatus("CQ 循环中 – 正在重复 F1")
         scheduleNextCq(macro)
     }
 
@@ -583,7 +672,7 @@ class MainActivity : AppCompatActivity() {
                 if (!cwEngine.isBusy()) {
                     sendMacro(macro)
                     vibrate(40)
-                    updateStatus("CQ LOOP ACTIVE – next call queued")
+        updateStatus("CQ 循环中 – 下一轮已排队")
                 }
                 scheduleNextCq(macro)     // interval is measured end-to-end
             }
@@ -594,7 +683,7 @@ class MainActivity : AppCompatActivity() {
         if (!cqLooping) return
         cqLooping = false
         cqHandler.removeCallbacksAndMessages(null)
-        updateStatus("Ready")
+        updateStatus("就绪")
     }
 
     // ── Log QSO ───────────────────────────────────────────────────────────────
@@ -602,12 +691,16 @@ class MainActivity : AppCompatActivity() {
     private fun logQso() {
         val call = etCallsign.text.toString().trim().uppercase()
         if (call.isEmpty() || parseFrequency(call) != null) {
-            toast("Enter a callsign first")
+            toast("请先输入呼号")
             return
         }
 
         val dupe = logMgr.isDupe(call, currentBand, settings.contestMode)
-        val rcvd = etExchange.text.toString().trim().uppercase()
+        val typed = etExchange.text.toString().trim().uppercase()
+        // Satellite mode has no exchange box; the QSO is exchanged with the
+        // same signal report we sent, so log that in the "rcvd" column.
+        val rcvd = if (typed.isEmpty() && settings.contestMode == ContestMode.SATELLITE)
+                       contestMgr.buildSentExchange() else typed
         val serial = contestMgr.consumeSerial()                 // null for WW / VHF
         val sent   = contestMgr.buildSentExchange(
             serial = serial ?: contestMgr.peekNextSerial()
@@ -637,18 +730,18 @@ class MainActivity : AppCompatActivity() {
         vibrate(30)
 
         lastSentMacro = ""
-        if (dupe) toast("Logged DUPE: $call on ${currentBand.displayName}")
-        else      updateStatus("Logged $call  ${sent}  /  $rcvd")
+        if (dupe) toast("已记录重复: $call (${currentBand.displayName})")
+        else      updateStatus("已记录 $call  ${sent}  /  $rcvd")
     }
 
     private fun showQsoOptions(entry: QSOEntry) {
         AlertDialog.Builder(this)
             .setTitle("${entry.callsign}  ·  ${entry.timeStr}Z  ·  ${entry.band.displayName}")
-            .setItems(arrayOf("Re-send exchange", "Delete entry", "Cancel")) { _, which ->
+            .setItems(arrayOf("重发交换信息", "删除此条", "取消")) { _, which ->
                 when (which) {
                     0 -> {
                         cwEngine.send("${entry.callsign} ${entry.sentExchange}")
-                        updateStatus("Re-sending ${entry.callsign}")
+                        updateStatus("正在重发 ${entry.callsign}")
                     }
                     1 -> {
                         logMgr.removeQSO(entry.id)
@@ -711,14 +804,14 @@ class MainActivity : AppCompatActivity() {
         R.id.action_reset_macros -> {
             settingsMgr.resetMacros(settings.contestMode)
             setupMacroGrid()
-            toast("Macros for ${settings.contestMode.displayName} restored")
+            toast("已恢复 ${settings.contestMode.displayName} 的默认宏")
             true
         }
         R.id.action_clear_log -> {
             AlertDialog.Builder(this)
-                .setTitle("Clear log?")
-                .setMessage("Delete all ${logMgr.count()} QSO entries? This cannot be undone.")
-                .setPositiveButton("Clear") { _, _ ->
+                .setTitle("清空日志？")
+                .setMessage("要删除全部 ${logMgr.count()} 条 QSO 记录吗？此操作不可撤销。")
+                .setPositiveButton("清空") { _, _ ->
                     logMgr.clear()
                     contestMgr.reset()
                     contestMgr.clearDupes()
@@ -726,7 +819,7 @@ class MainActivity : AppCompatActivity() {
                     updateSerial()
                     updateTxHint()
                 }
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton("取消", null)
                 .show()
             true
         }
@@ -745,10 +838,10 @@ class MainActivity : AppCompatActivity() {
 
     private fun exportWithPermission(saver: () -> String?) {
         val granted = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q ||
-            ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED
+            ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) ==
+            PackageManager.PERMISSION_GRANTED
         if (granted) {
-            toast(saver()?.let { "Saved to:\n$it" } ?: "Export failed")
+            toast(saver()?.let { "已保存到:\n$it" } ?: "导出失败")
             return
         }
         pendingExport = saver
@@ -763,9 +856,9 @@ class MainActivity : AppCompatActivity() {
             val cb = pendingExport
             pendingExport = null
             if (grantResults.firstOrNull() == PackageManager.PERMISSION_GRANTED) {
-                toast(cb?.invoke()?.let { "Saved to:\n$it" } ?: "Export failed")
+                toast(cb?.invoke()?.let { "已保存到:\n$it" } ?: "导出失败")
             } else {
-                toast("Storage permission denied – export cancelled")
+                toast("未授予存储权限 – 导出已取消")
             }
         }
     }
@@ -773,7 +866,7 @@ class MainActivity : AppCompatActivity() {
     // ── Helpers ───────────────────────────────────────────────────────────────
 
     private fun updateSerial() {
-        tvSerial.text = "NR:${contestMgr.formatSerial(contestMgr.peekNextSerial())}"
+        tvSerial.text = "序号:${contestMgr.formatSerial(contestMgr.peekNextSerial())}"
     }
 
     private fun updateStatus(text: String) {
@@ -814,12 +907,12 @@ class MainActivity : AppCompatActivity() {
         }
         override fun onMessageComplete() {
             runOnUiThread {
-                updateStatus(if (cqLooping) "CQ LOOP ACTIVE" else "Ready")
+                updateStatus(if (cqLooping) "CQ 循环中" else "就绪")
                 vibrate(15)
             }
         }
         override fun onAborted() {
-            runOnUiThread { updateStatus("Aborted") }
+            runOnUiThread { updateStatus("已中止") }
         }
     }
 
@@ -827,20 +920,20 @@ class MainActivity : AppCompatActivity() {
 
     private val usbListener = object : USBSerialManager.Listener {
         override fun onDeviceAttached(device: android.hardware.usb.UsbDevice) {
-            runOnUiThread { toast("USB: ${device.productName ?: "device"} attached") }
+            runOnUiThread { toast("USB: ${device.productName ?: "device"} 已接入") }
         }
         override fun onDeviceDetached() {
-            runOnUiThread { updateStatus("USB disconnected") }
+            runOnUiThread { updateStatus("USB 已断开") }
         }
         override fun onPortOpened() {
             cwEngine.setIdle()
             runOnUiThread {
-                updateStatus("USB connected – key line idle")
+                updateStatus("USB 已连接 – 键控线空闲")
                 tvRts.setTextColor(color(R.attr.cwTextDim))
             }
         }
         override fun onPortClosed() {
-            runOnUiThread { updateStatus("USB closed") }
+            runOnUiThread { updateStatus("USB 已关闭") }
         }
         override fun onError(msg: String) {
             runOnUiThread { toast("USB: $msg") }

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- F1–F12 macro grid: 4 columns x 3 rows. The grid stretches to the full
+         screen width in both orientations, so the buttons stay wide. -->
+    <integer name="macro_columns">4</integer>
+</resources>

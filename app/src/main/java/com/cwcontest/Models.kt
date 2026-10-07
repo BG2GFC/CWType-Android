@@ -7,7 +7,9 @@ import java.util.*
 enum class ContestMode(val displayName: String, val shortName: String) {
     CQ_WW_CW("CQ WW CW", "CQWW"),
     CQ_WW_VHF("CQ WW VHF", "CQVHF"),
-    CQ_WPX_CW("CQ WPX CW", "CQWPX")
+    CQ_WPX_CW("CQ WPX CW", "CQWPX"),
+    /** Satellite QSOs: the exchange is just the signal report (5NN). */
+    SATELLITE("卫星", "SAT")
 }
 
 // ── Amateur Radio Bands ────────────────────────────────────────────────────────
@@ -19,7 +21,8 @@ enum class Band(val mhz: Double, val displayName: String, val freqStart: Double,
     BAND_15(21.0,  "15m", 21.000, 21.450),
     BAND_10(28.0,  "10m", 28.000, 29.700),
     BAND_6( 50.0,  "6m",  50.000, 54.000),
-    BAND_2(144.0,  "2m", 144.000,148.000);
+    BAND_2(144.0,  "2m", 144.000,148.000),
+    BAND_70(435.0, "70cm",430.000,440.000);
 
     companion object {
         fun fromFreq(mhz: Double): Band? = values().firstOrNull {
@@ -31,13 +34,18 @@ enum class Band(val mhz: Double, val displayName: String, val freqStart: Double,
                 listOf(BAND_160, BAND_80, BAND_40, BAND_20, BAND_15, BAND_10)
             ContestMode.CQ_WW_VHF ->
                 listOf(BAND_6, BAND_2)
+            // Satellites: 10 m (AO-7 / RS-15 downlink) plus the usual 2 m /
+            // 70 cm transponder pair. 2 m is listed last so it becomes the
+            // default band when this mode is selected.
+            ContestMode.SATELLITE ->
+                listOf(BAND_10, BAND_70, BAND_2)
         }
     }
 }
 
 // ── Keyer Modes ───────────────────────────────────────────────────────────────
 enum class KeyerMode(val displayName: String) {
-    STRAIGHT("Straight"),
+    STRAIGHT("直发"),
     IAMBIC_A("Iambic A"),
     IAMBIC_B("Iambic B")
 }

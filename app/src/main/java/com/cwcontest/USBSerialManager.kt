@@ -113,7 +113,7 @@ class USBSerialManager(private val context: Context) {
             if (granted) {
                 pendingOpen?.let { (info, baud) -> openPort(info, baud) }
             } else {
-                listener?.onError("USB permission denied")
+        listener?.onError("USB 权限被拒绝")
             }
             pendingOpen = null
         }
@@ -169,7 +169,7 @@ class USBSerialManager(private val context: Context) {
     private fun openPort(info: DeviceInfo, baudRate: Int) {
         try {
             val connection = usbManager.openDevice(info.driver.device)
-                ?: run { listener?.onError("Cannot open USB device"); return }
+            ?: run { listener?.onError("无法打开 USB 设备"); return }
 
             port = info.driver.ports[info.portIndex]
             port!!.open(connection)
@@ -184,7 +184,7 @@ class USBSerialManager(private val context: Context) {
             Log.i(TAG, "Port opened: ${info.displayName} @ ${baudRate} baud")
         } catch (e: Exception) {
             Log.e(TAG, "Open failed", e)
-            listener?.onError("Open failed: ${e.message}")
+            listener?.onError("打开失败: ${e.message}")
             isOpen = false
         }
     }
@@ -216,8 +216,8 @@ class USBSerialManager(private val context: Context) {
     fun isConnected(): Boolean = isOpen && port != null
 
     fun getStatusString(): String {
-        if (!isOpen) return "Disconnected"
-        val p = port ?: return "Disconnected"
-        return "Connected | RTS:${p.rts} DTR:${p.dtr}"
+        if (!isOpen) return "未连接"
+        val p = port ?: return "未连接"
+        return "已连接 | RTS:${p.rts} DTR:${p.dtr}"
     }
 }

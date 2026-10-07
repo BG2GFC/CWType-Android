@@ -75,14 +75,18 @@ class ContestManager(private var settings: AppSettings) {
     fun exchangeFields(mode: ContestMode = settings.contestMode): List<ExchangeField> = when (mode) {
         ContestMode.CQ_WW_CW -> listOf(
             ExchangeField("RST",  "599",    true,  false),
-            ExchangeField("Zone", "e.g. 14", true, false)
+            ExchangeField("分区", "如 14", true, false)
         )
         ContestMode.CQ_WW_VHF -> listOf(
-            ExchangeField("Grid", "Maidenhead 4-char", true, true)
+            ExchangeField("网格", "梅登黑德 4 位", true, true)
         )
         ContestMode.CQ_WPX_CW -> listOf(
             ExchangeField("RST",    "599", true,  false),
-            ExchangeField("Serial", "NNN", true,  true)
+            ExchangeField("序号", "NNN", true,  true)
+        )
+        ContestMode.SATELLITE -> listOf(
+            ExchangeField("RST",  "5NN", false, false),
+            ExchangeField("网格", "梅登黑德 4 位", false, true)
         )
     }
 
@@ -94,6 +98,8 @@ class ContestManager(private var settings: AppSettings) {
         ContestMode.CQ_WW_CW  -> "599 ${"%02d".format(settings.myZone)}"
         ContestMode.CQ_WW_VHF -> settings.myGrid.take(4).uppercase()
         ContestMode.CQ_WPX_CW -> "599 ${formatSerial(serial)}"
+        // Satellite: the whole exchange is the signal report.
+        ContestMode.SATELLITE -> "5NN"
     }
 
     // ── Default Macros per Contest ─────────────────────────────────────────────
@@ -102,47 +108,62 @@ class ContestManager(private var settings: AppSettings) {
 
         ContestMode.CQ_WW_CW -> listOf(
             Macro(1,  "CQ",      "CQ CQ DE {MYCALL} {MYCALL} K",       1),
-            Macro(2,  "Exchange","599 {ZONE}",                          2),
+            Macro(2,  "交换",    "599 {ZONE}",                          2),
             Macro(3,  "TU",      "TU {MYCALL} K",                      3),
-            Macro(4,  "His Call","{CALL}",                              4),
+            Macro(4,  "对方呼号","{CALL}",                              4),
             Macro(5,  "AGN?",    "AGN?",                                5),
-            Macro(6,  "NR?",     "NR?",                                 6),
+            Macro(6,  "序号?",   "NR?",                                 6),
             Macro(7,  "QRZ?",    "QRZ? {MYCALL}",                      7),
-            Macro(8,  "CQ Short","CQ DE {MYCALL} K",                   8),
+            Macro(8,  "短CQ",    "CQ DE {MYCALL} K",                   8),
             Macro(9,  "?",       "?",                                   9),
-            Macro(10, "Full Log","{CALL} 599 {ZONE} {MYCALL} K",      10),
+            Macro(10, "完整通联","{CALL} 599 {ZONE} {MYCALL} K",      10),
             Macro(11, "S&P",     "{MYCALL}",                           11),
             Macro(12, "TU+CQ",   "TU {MYCALL} CQ CQ DE {MYCALL} K",  12)
         )
 
         ContestMode.CQ_WW_VHF -> listOf(
             Macro(1,  "CQ",      "CQ CQ DE {MYCALL} {MYCALL} K",       1),
-            Macro(2,  "Exchange","{GRID}",                              2),
+            Macro(2,  "交换",    "{GRID}",                              2),
             Macro(3,  "TU",      "TU {MYCALL} K",                      3),
-            Macro(4,  "His Call","{CALL}",                              4),
+            Macro(4,  "对方呼号","{CALL}",                              4),
             Macro(5,  "AGN?",    "AGN?",                                5),
-            Macro(6,  "Grid?",   "GRID?",                               6),
+            Macro(6,  "网格?",   "GRID?",                               6),
             Macro(7,  "QRZ?",    "QRZ? {MYCALL}",                      7),
-            Macro(8,  "CQ Short","CQ DE {MYCALL} K",                   8),
+            Macro(8,  "短CQ",    "CQ DE {MYCALL} K",                   8),
             Macro(9,  "?",       "?",                                   9),
-            Macro(10, "Full Log","{CALL} {MYCALL} {GRID} K",          10),
+            Macro(10, "完整通联","{CALL} {MYCALL} {GRID} K",          10),
             Macro(11, "S&P",     "{MYCALL}",                           11),
             Macro(12, "TU+CQ",   "TU {MYCALL} CQ CQ DE {MYCALL} K",  12)
         )
 
         ContestMode.CQ_WPX_CW -> listOf(
             Macro(1,  "CQ",      "CQ CQ DE {MYCALL} {MYCALL} K",       1),
-            Macro(2,  "Exchange","599 {SERIAL}",                        2),
+            Macro(2,  "交换",    "599 {SERIAL}",                        2),
             Macro(3,  "TU",      "TU {SERIAL} {MYCALL} K",             3),
-            Macro(4,  "His Call","{CALL}",                              4),
+            Macro(4,  "对方呼号","{CALL}",                              4),
             Macro(5,  "AGN?",    "AGN?",                                5),
-            Macro(6,  "NR?",     "NR?",                                 6),
+            Macro(6,  "序号?",   "NR?",                                 6),
             Macro(7,  "QRZ?",    "QRZ? {MYCALL}",                      7),
-            Macro(8,  "CQ Short","CQ DE {MYCALL} K",                   8),
+            Macro(8,  "短CQ",    "CQ DE {MYCALL} K",                   8),
             Macro(9,  "?",       "?",                                   9),
-            Macro(10, "Full Log","{CALL} 599 {SERIAL} {MYCALL} K",   10),
+            Macro(10, "完整通联","{CALL} 599 {SERIAL} {MYCALL} K",   10),
             Macro(11, "S&P",     "{MYCALL}",                           11),
             Macro(12, "TU+CQ",   "TU {SERIAL} {MYCALL} CQ DE {MYCALL} K", 12)
+        )
+
+        ContestMode.SATELLITE -> listOf(
+            Macro(1,  "CQ",      "CQ CQ {MYCALL} {MYCALL} K",          1),
+            Macro(2,  "报告",    "5NN",                                 2),
+            Macro(3,  "TU",      "5NN TU",                              3),
+            Macro(4,  "对方呼号","{CALL}",                              4),
+            Macro(5,  "AGN?",    "AGN?",                                5),
+            Macro(6,  "网格?",   "GRID?",                               6),
+            Macro(7,  "QRZ?",    "QRZ? {MYCALL}",                      7),
+            Macro(8,  "短CQ",    "CQ {MYCALL} K",                      8),
+            Macro(9,  "?",       "?",                                   9),
+            Macro(10, "完整通联","{CALL} 5NN {MYCALL} K",             10),
+            Macro(11, "S&P",     "{MYCALL}",                           11),
+            Macro(12, "TU+CQ",   "5NN TU {MYCALL} {MYCALL} K",        12)
         )
     }
 

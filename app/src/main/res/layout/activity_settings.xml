@@ -12,11 +12,11 @@
 
         <!-- ── Station ──────────────────────────────────────────────────── -->
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="STATION INFO" android:textColor="?attr/cwAccent"
+            android:text="台站信息" android:textColor="?attr/cwAccent"
             android:textSize="12sp" android:textStyle="bold"/>
 
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="My Callsign" android:textColor="?attr/cwTextDim" android:textSize="12sp"
+            android:text="我的呼号" android:textColor="?attr/cwTextDim" android:textSize="12sp"
             android:layout_marginTop="8dp"/>
         <EditText android:id="@+id/etMyCall"
             android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -25,7 +25,7 @@
             android:inputType="textCapCharacters" android:singleLine="true"/>
 
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="My Grid (4-char Maidenhead, e.g. PM01) — CQ WW VHF"
+            android:text="我的网格 (4 位梅登黑德, 如 PM01) — CQ WW VHF"
             android:textColor="?attr/cwTextDim"
             android:textSize="12sp" android:layout_marginTop="8dp"/>
         <EditText android:id="@+id/etMyGrid"
@@ -35,7 +35,7 @@
             android:inputType="textCapCharacters" android:singleLine="true"/>
 
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="CQ Zone (e.g. 24) — CQ WW" android:textColor="?attr/cwTextDim"
+            android:text="CQ 分区 (如 24) — CQ WW" android:textColor="?attr/cwTextDim"
             android:textSize="12sp" android:layout_marginTop="8dp"/>
         <EditText android:id="@+id/etMyZone"
             android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
             android:inputType="number" android:singleLine="true"/>
 
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="Starting Serial Number — CQ WPX"
+            android:text="起始序号 — CQ WPX"
             android:textColor="?attr/cwTextDim"
             android:textSize="12sp" android:layout_marginTop="8dp"/>
         <EditText android:id="@+id/etSerial"
@@ -58,13 +58,13 @@
             android:background="?attr/cwSurface"
             android:layout_marginTop="12dp" android:layout_marginBottom="8dp"/>
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="USB / CW KEYING" android:textColor="?attr/cwAccent"
+            android:text="USB / CW 键控" android:textColor="?attr/cwAccent"
             android:textSize="12sp" android:textStyle="bold"/>
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="6dp">
             <TextView android:layout_width="0dp" android:layout_weight="1"
-                android:text="Use RTS for CW" android:textColor="?attr/cwText" android:textSize="13sp"
+                android:text="用 RTS 键控" android:textColor="?attr/cwText" android:textSize="13sp"
                 android:layout_height="wrap_content"/>
             <Switch android:id="@+id/switchRts" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         </LinearLayout>
@@ -72,7 +72,7 @@
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="4dp">
             <TextView android:layout_width="0dp" android:layout_weight="1"
-                android:text="Use DTR for CW" android:textColor="?attr/cwText" android:textSize="13sp"
+                android:text="用 DTR 键控" android:textColor="?attr/cwText" android:textSize="13sp"
                 android:layout_height="wrap_content"/>
             <Switch android:id="@+id/switchDtr" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         </LinearLayout>
@@ -80,32 +80,32 @@
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="4dp">
             <TextView android:layout_width="0dp" android:layout_weight="1"
-                android:text="Invert Logic (key down = LOW level)" android:textColor="?attr/cwText" android:textSize="13sp"
+                android:text="反相逻辑 (按下 = 低电平)" android:textColor="?attr/cwText" android:textSize="13sp"
                 android:layout_height="wrap_content"/>
             <Switch android:id="@+id/switchInvert" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="Baud Rate (RTS/DTR keying ignores this, any value works)"
+            android:text="波特率 (RTS/DTR 键控不用它, 任意值均可)"
             android:textColor="?attr/cwTextDim"
             android:textSize="12sp" android:layout_marginTop="8dp"/>
         <Spinner android:id="@+id/spinBaud"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
 
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="Keyer Mode (DOT / DASH paddle on the main screen)"
+            android:text="键控模式 (主界面的点/划拨片)"
             android:textColor="?attr/cwTextDim"
             android:textSize="12sp" android:layout_marginTop="8dp"/>
         <Spinner android:id="@+id/spinKeyer"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
 
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="Straight = hold DOT to key. Iambic A/B = squeeze both paddles to alternate."
+            android:text="直发 = 按住「点」即拍发; Iambic A/B = 双桨捏合交替拍发"
             android:textColor="?attr/cwTextDim"
             android:textSize="11sp" android:layout_marginTop="2dp"/>
 
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="Tail gap after each message (dot units, 1 = one dot)"
+            android:text="每组末尾补空隙 (点单位, 1 = 一个点)"
             android:textColor="?attr/cwTextDim"
             android:textSize="12sp" android:layout_marginTop="8dp"/>
         <EditText android:id="@+id/etTailGap"
@@ -119,20 +119,20 @@
             android:background="?attr/cwSurface"
             android:layout_marginTop="12dp" android:layout_marginBottom="8dp"/>
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="SIDETONE" android:textColor="?attr/cwAccent"
+            android:text="边音" android:textColor="?attr/cwAccent"
             android:textSize="12sp" android:textStyle="bold"/>
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="6dp">
             <TextView android:layout_width="0dp" android:layout_weight="1"
-                android:text="Enable Sidetone (headphone / speaker monitoring)"
+                android:text="开启边音 (耳机 / 扬声器监听)"
                 android:textColor="?attr/cwText" android:textSize="13sp"
                 android:layout_height="wrap_content"/>
             <Switch android:id="@+id/switchSidetone" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="Frequency (Hz, e.g. 700)" android:textColor="?attr/cwTextDim"
+            android:text="频率 (Hz, 如 700)" android:textColor="?attr/cwTextDim"
             android:textSize="12sp" android:layout_marginTop="8dp"/>
         <EditText android:id="@+id/etSidetoneFreq"
             android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -141,7 +141,7 @@
             android:inputType="number" android:singleLine="true"/>
 
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="Volume" android:textColor="?attr/cwTextDim"
+            android:text="音量" android:textColor="?attr/cwTextDim"
             android:textSize="12sp" android:layout_marginTop="8dp"/>
         <SeekBar android:id="@+id/seekSidetoneVol"
             android:layout_width="match_parent" android:layout_height="wrap_content"/>
@@ -151,20 +151,20 @@
             android:background="?attr/cwSurface"
             android:layout_marginTop="12dp" android:layout_marginBottom="8dp"/>
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="CQ LOOP" android:textColor="?attr/cwAccent"
+            android:text="CQ 循环" android:textColor="?attr/cwAccent"
             android:textSize="12sp" android:textStyle="bold"/>
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="6dp">
             <TextView android:layout_width="0dp" android:layout_weight="1"
-                android:text="Enable CQ Loop (press F1 to start, ABORT to stop)"
+                android:text="开启 CQ 循环 (按 F1 开始, 按中止停止)"
                 android:textColor="?attr/cwText" android:textSize="13sp"
                 android:layout_height="wrap_content"/>
             <Switch android:id="@+id/switchCqLoop" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
         </LinearLayout>
 
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="Repeat Interval (seconds)" android:textColor="?attr/cwTextDim"
+            android:text="重复间隔 (秒)" android:textColor="?attr/cwTextDim"
             android:textSize="12sp" android:layout_marginTop="8dp"/>
         <EditText android:id="@+id/etCqInterval"
             android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -177,13 +177,13 @@
             android:background="?attr/cwSurface"
             android:layout_marginTop="12dp" android:layout_marginBottom="8dp"/>
         <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:text="APPEARANCE" android:textColor="?attr/cwAccent"
+            android:text="外观" android:textColor="?attr/cwAccent"
             android:textSize="12sp" android:textStyle="bold"/>
 
         <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
             android:orientation="horizontal" android:gravity="center_vertical" android:layout_marginTop="6dp">
             <TextView android:layout_width="0dp" android:layout_weight="1"
-                android:text="Dark theme (off = light theme)"
+                android:text="暗色主题 (关闭 = 亮色主题)"
                 android:textColor="?attr/cwText" android:textSize="13sp"
                 android:layout_height="wrap_content"/>
             <Switch android:id="@+id/switchDark" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
@@ -194,7 +194,7 @@
             android:id="@+id/btnSaveSettings"
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:text="SAVE SETTINGS"
+            android:text="保存设置"
             android:textSize="14sp"
             android:layout_marginTop="20dp"/>
 
